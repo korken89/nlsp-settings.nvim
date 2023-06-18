@@ -113,8 +113,13 @@ M.open_local_config = function(server_name)
   local conf = config.get()
   local root_dir
   if lspconfig[server_name] then
-    root_dir = lspconfig[server_name].get_root_dir(path.sanitize(start_path))
-  end
+    -- root_dir = lspconfig[server_name].get_root_dir(path.sanitize(start_path))
+    local sanitized_start_path = path.sanitize(start_path)
+    local coro = coroutine.wrap(function()
+        return lspconfig[server_name].get_root_dir(sanitized_start_path)
+    end)
+    root_dir = coro()
+ end
 
   if not root_dir then
     local markers = conf.local_settings_root_markers_fallback
